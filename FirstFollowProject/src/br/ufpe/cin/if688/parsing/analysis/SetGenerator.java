@@ -4,9 +4,11 @@ import br.ufpe.cin.if688.parsing.grammar.Grammar;
 import br.ufpe.cin.if688.parsing.grammar.Nonterminal;
 import br.ufpe.cin.if688.parsing.grammar.Production;
 import br.ufpe.cin.if688.parsing.grammar.Terminal;
-import javafx.util.Pair;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 
 public final class SetGenerator {
@@ -66,57 +68,40 @@ public final class SetGenerator {
             throw new NullPointerException();
 
         Map<Nonterminal, Set<GeneralSymbol>> follow = initializeNonterminalMapping(g);
-        Set<Pair<GeneralSymbol, GeneralSymbol>> toBeAdded = new HashSet<Pair<GeneralSymbol, GeneralSymbol>>();
 
-//        for(Production p: g.getProductions()) {
-//            if(p.getNonterminal().equals(g.getStartSymbol())) {
-//                follow.get(p.getNonterminal()).add(SpecialSymbol.EOF);
-//            }
-//            for(GeneralSymbol s: p.getProduction()) {
-//
-//            }
-//        }
         follow.get(g.getStartSymbol()).add(SpecialSymbol.EOF);
-        for(GeneralSymbol nt: g.getNonterminals()) {
-            for(Production p : g.getProductions()) {
-                for(int i = 0; i < p.getProduction().size(); i++) {
-                    GeneralSymbol s = p.getProduction().get(i);
-                    if(s.equals(nt)) {
-                        try {
-                            GeneralSymbol next = p.getProduction().get(i + 1);
-                            if(next instanceof Terminal) {
-                                follow.get(s).add(next);
-                            } else if(next instanceof Nonterminal) {
-                                for(GeneralSymbol f: first.get(next)) {
-                                    if(!f.equals(SpecialSymbol.EPSILON)) {
-                                        // Se o simbolo no first do next não for epsilon, adiciona no follow
-                                        follow.get(s).add(f);
-                                    } else {
-                                        // Se houver um epsilon no first de next, o follow de generator é adicionado no Nonterminal da iteracao
-                                        GeneralSymbol generator = p.getNonterminal();
-                                        toBeAdded.add(new Pair<GeneralSymbol, GeneralSymbol>(generator, s));
-                                        for(GeneralSymbol t: follow.get(generator)) {
-                                            follow.get(s).add(t);
-                                        }
-                                    }
+        // TODO implementar o while até que fique com o conj clone igual.
+        for(Production p: g.getProductions()) {
+            // FOLLOW(A)
+            Set<GeneralSymbol> followNonTerminal = follow.get(p.getNonterminal());
+            for(int i = p.getProduction().size() - 1; i >= 0; i--) {
+                GeneralSymbol actual = p.getProduction().get(i);
+                if(actual instanceof Nonterminal) {
+                    try {
+                        GeneralSymbol next = p.getProduction().get(i + 1);
+                        // Se o next for um Nao terminal
+                        if(next instanceof Nonterminal) {
+                            for(GeneralSymbol d: first.get(next)) {
+                                if(!d.equals(SpecialSymbol.EPSILON)) {
+                                    follow.get(actual).add(d);
                                 }
                             }
-                        } catch (IndexOutOfBoundsException e) {
-                            // Quando o Nonterminal da iteracao for um ultimo na regra, o follow de generator estará no follow do Nonterminal da iteracao
-                            Nonterminal generator = p.getNonterminal();
-                            toBeAdded.add(new Pair<GeneralSymbol, GeneralSymbol>(generator, s));
-                            for(GeneralSymbol t: follow.get(generator)) {
-                                follow.get(s).add(t);
+                            // Se o first do next possuir epsilon,
+                            if(first.get(next).contains(SpecialSymbol.EPSILON)) {
+                                for(GeneralSymbol d: followNonTerminal) {
+                                    follow.get(actual).add(d);
+                                }
                             }
+                        } else if(!next.equals(SpecialSymbol.EPSILON)) {
+                            // Se for um terminal adiciona no follow do atual
+                            follow.get(actual).add(next);
+                        }
+                    } catch (IndexOutOfBoundsException e) {
+                        for(GeneralSymbol fnt: followNonTerminal) {
+                            follow.get(actual).add(fnt);
                         }
                     }
                 }
-            }
-        }
-
-        for(Pair<GeneralSymbol, GeneralSymbol> p: toBeAdded) {
-            for(GeneralSymbol t: follow.get(p.getKey())) {
-                follow.get(p.getValue()).add(t);
             }
         }
 
