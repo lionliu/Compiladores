@@ -68,42 +68,54 @@ public final class SetGenerator {
             throw new NullPointerException();
 
         Map<Nonterminal, Set<GeneralSymbol>> follow = initializeNonterminalMapping(g);
+        Set<GeneralSymbol> x = new HashSet<>();
+        x.add(SpecialSymbol.EOF);
+        follow.put(g.getStartSymbol(), x);
+        for(int f = 0; f < g.getProductions().size(); f++) {
+            for(Production p: g.getProductions()) {
+                // FOLLOW(A)
 
-        follow.get(g.getStartSymbol()).add(SpecialSymbol.EOF);
-        // TODO implementar o while até que fique com o conj clone igual.
-        for(Production p: g.getProductions()) {
-            // FOLLOW(A)
-            Set<GeneralSymbol> followNonTerminal = follow.get(p.getNonterminal());
-            for(int i = p.getProduction().size() - 1; i >= 0; i--) {
-                GeneralSymbol actual = p.getProduction().get(i);
-                if(actual instanceof Nonterminal) {
-                    try {
-                        GeneralSymbol next = p.getProduction().get(i + 1);
-                        // Se o next for um Nao terminal
-                        if(next instanceof Nonterminal) {
-                            for(GeneralSymbol d: first.get(next)) {
-                                if(!d.equals(SpecialSymbol.EPSILON)) {
-                                    follow.get(actual).add(d);
+                Set<GeneralSymbol> followNonTerminal = follow.get(p.getNonterminal());
+                for(int i = p.getProduction().size() - 1; i >= 0; i--) {
+                    GeneralSymbol actual = p.getProduction().get(i);
+                    if(actual instanceof Nonterminal) {
+                        try {
+                            GeneralSymbol next = p.getProduction().get(i + 1);
+                            // Se o next for um Nao terminal
+                            if(next instanceof Nonterminal) {
+                                for(GeneralSymbol d: first.get(next)) {
+                                    if(!d.equals(SpecialSymbol.EPSILON)) {
+                                        follow.get(actual).add(d);
+                                    }
                                 }
-                            }
-                            // Se o first do next possuir epsilon,
-                            if(first.get(next).contains(SpecialSymbol.EPSILON)) {
-                                for(GeneralSymbol d: followNonTerminal) {
-                                    follow.get(actual).add(d);
+                                // Se o first do next possuir epsilon,
+                                if(first.get(next).contains(SpecialSymbol.EPSILON)) {
+//                                    follow.put(actual, )
+                                    if(i != p.getProduction().size() - 1) {
+                                        for(GeneralSymbol d: follow.get(next)) {
+                                            follow.get(actual).add(d);
+                                        }
+                                    } else if(i == p.getProduction().size() - 1){
+                                        for(GeneralSymbol h: follow.get(p.getNonterminal())) {
+                                            follow.get(actual).add(h);
+                                        }
+                                    }
+
                                 }
+                            } else if(!next.equals(SpecialSymbol.EPSILON)) {
+                                // Se for um terminal adiciona no follow do atual
+                                follow.get(actual).add(next);
                             }
-                        } else if(!next.equals(SpecialSymbol.EPSILON)) {
-                            // Se for um terminal adiciona no follow do atual
-                            follow.get(actual).add(next);
-                        }
-                    } catch (IndexOutOfBoundsException e) {
-                        for(GeneralSymbol fnt: followNonTerminal) {
-                            follow.get(actual).add(fnt);
+                        } catch (IndexOutOfBoundsException e) {
+                            for(GeneralSymbol fnt: followNonTerminal) {
+                                follow.get(actual).add(fnt);
+                            }
                         }
                     }
                 }
             }
         }
+
 
         return follow;
     }
