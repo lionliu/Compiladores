@@ -58,9 +58,7 @@ public final class SetGenerator {
             }
         }
         return first;
-
     }
-
 
     public static Map<Nonterminal, Set<GeneralSymbol>> getFollow(Grammar g, Map<Nonterminal, Set<GeneralSymbol>> first) {
 
@@ -74,7 +72,6 @@ public final class SetGenerator {
         for(int f = 0; f < g.getProductions().size(); f++) {
             for(Production p: g.getProductions()) {
                 // FOLLOW(A)
-
                 Set<GeneralSymbol> followNonTerminal = follow.get(p.getNonterminal());
                 for(int i = p.getProduction().size() - 1; i >= 0; i--) {
                     GeneralSymbol actual = p.getProduction().get(i);
@@ -119,32 +116,6 @@ public final class SetGenerator {
 
         return follow;
     }
-
-//    public static void searchNext(Grammar g, Nonterminal actual, Nonterminal generator, Map<Nonterminal, Set<GeneralSymbol>> follow, Map<Nonterminal, Set<GeneralSymbol>> first) {
-//        for(Production p: g.getProductions()) {
-//            for(int i = 0; i < p.getProduction().size(); i++) {
-//                if(generator.equals(p.getProduction().get(i))) {
-//                    try {
-//                        GeneralSymbol next = p.getProduction().get(i+1);
-//                        if(!next.equals(actual)) {
-//                            if(next instanceof Terminal) {
-//                                follow.get(actual).add(next);
-//                            } else if(next instanceof Nonterminal) {
-//                                for(GeneralSymbol f: first.get(next)) {
-//                                    if(!f.equals(SpecialSymbol.EPSILON)) {
-//                                        follow.get(actual).add(f);
-//                                    }
-//
-//                                }
-//                            }
-//                        }
-//                    } catch (IndexOutOfBoundsException e) {
-//                        follow.get(actual).add(SpecialSymbol.EOF);
-//                    }
-//                }
-//            }
-//        }
-//    }
 
     //método para inicializar mapeamento nãoterminais -> conjunto de símbolos
     private static Map<Nonterminal, Set<GeneralSymbol>>

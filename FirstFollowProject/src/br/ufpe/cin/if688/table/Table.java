@@ -20,9 +20,25 @@ public final class Table {
         Map<LL1Key, List<GeneralSymbol>> parsingTable =
                 new HashMap<LL1Key, List<GeneralSymbol>>();
 
-        /*
-         * Implemente aqui o método para retornar a parsing table
-         */
+        for(Production p: g.getProductions()) {
+            if(p.getProduction().get(0) instanceof Terminal) {
+                // Se for terminal, adiciona no M[p.getNonterminal, p.getProduction().get(0)]
+                LL1Key temp = new LL1Key(p.getNonterminal(), p.getProduction().get(0));
+                parsingTable.put(temp, p.getProduction());
+            } else if(p.getProduction().get(0).equals(SpecialSymbol.EPSILON)) {
+                // Se for epsilon preenche a tabela do com follow do p.getNonterminal
+                for(GeneralSymbol b: follow.get(p.getNonterminal())) {
+                    LL1Key temp2 = new LL1Key(p.getNonterminal(), b);
+                    parsingTable.put(temp2, p.getProduction());
+                }
+            } else if(p.getProduction().get(0) instanceof Nonterminal) {
+                for(GeneralSymbol s: first.get(p.getProduction().get(0))) {
+                    LL1Key temp = new LL1Key(p.getNonterminal(), s);
+                    parsingTable.put(temp, p.getProduction());
+                }
+            }
+
+        }
 
         return parsingTable;
     }
