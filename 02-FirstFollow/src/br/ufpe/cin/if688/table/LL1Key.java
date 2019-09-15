@@ -16,22 +16,22 @@ public class LL1Key {
         this.terminal = terminal;
     }
 
-    @Override 
+    @Override
     public boolean equals(Object o) {
         if (!(o instanceof LL1Key)) return false;
 
         LL1Key other = (LL1Key) o;
 
         return terminal.equals(other.terminal) &&
-               nonterminal.equals(other.nonterminal);
+                nonterminal.equals(other.nonterminal);
     }
 
-    @Override 
+    @Override
     public int hashCode() {
         return 31 * nonterminal.hashCode() + terminal.hashCode();
     }
 
-    @Override 
+    @Override
     public String toString() {
         return "(" + nonterminal + ", " + terminal + ")";
     }

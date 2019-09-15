@@ -10,7 +10,7 @@ public final class Production implements Iterable<GeneralSymbol> {
     private final List<GeneralSymbol> production;
 
     public Production(Nonterminal nt, List<GeneralSymbol> production) {
-        
+
         if (nt == null || production == null)
             throw new NullPointerException("Argumentos para producao nao podem ser nulos.");
 
@@ -30,8 +30,8 @@ public final class Production implements Iterable<GeneralSymbol> {
         return getProduction().iterator();
     }
 
-    @Override 
+    @Override
     public String toString() {
         return nt + " -> " + production;
     }
-} 
+}

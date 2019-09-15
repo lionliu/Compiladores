@@ -15,22 +15,22 @@ public abstract class Symbol extends GeneralSymbol {
         this.terminal = isTerminal;
     }
 
-   
+
     public final boolean isTerminal() {
         return terminal;
     }
 
-   
+
     public final String getName() {
         return name;
     }
 
-    
+
     public int hashCode() {
         return 31 * name.hashCode() + (terminal? 1 : 0);
     }
 
-    
+
     public boolean equals(Object o) {
         if (!(o instanceof Symbol)) return false;
 
@@ -39,10 +39,10 @@ public abstract class Symbol extends GeneralSymbol {
         return terminal == other.terminal && name.equals(other.name);
     }
 
-   
+
     public String toString() {
         if (terminal) return name;
-        
+
         return "<" + name + ">";
     }
 }

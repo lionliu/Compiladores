@@ -1,8 +1,8 @@
 package br.ufpe.cin.if688.parsing.analysis;
 
- 
+
 public final class ConcreteSymbol extends GeneralSymbol {
-   
+
     private final GeneralSymbol symbol;
 
     public ConcreteSymbol(GeneralSymbol s) {
@@ -15,12 +15,12 @@ public final class ConcreteSymbol extends GeneralSymbol {
         return symbol;
     }
 
-    @Override 
+    @Override
     public int hashCode() {
         return symbol.hashCode();
     }
 
-    @Override 
+    @Override
     public boolean equals(Object o) {
         if (!(o instanceof ConcreteSymbol)) return false;
 
@@ -31,4 +31,4 @@ public final class ConcreteSymbol extends GeneralSymbol {
     public String toString() {
         return symbol.toString();
     }
-} 
+}

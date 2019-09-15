@@ -20,10 +20,47 @@ public final class Table {
         Map<LL1Key, List<GeneralSymbol>> parsingTable =
                 new HashMap<LL1Key, List<GeneralSymbol>>();
 
-        /*
-         * Implemente aqui o método para retornar a parsing table
-         */
+        for(Production p: g.getProductions()) {
+            if(p.getProduction().get(0) instanceof Terminal) {
+                // Se for terminal, adiciona no M[p.getNonterminal, p.getProduction().get(0)]
+                LL1Key temp = new LL1Key(p.getNonterminal(), p.getProduction().get(0));
+                parsingTable.put(temp, p.getProduction());
+            } else if(p.getProduction().get(0).equals(SpecialSymbol.EPSILON)) {
+                // Se for epsilon preenche a tabela do com follow do p.getNonterminal
+                for(GeneralSymbol b: follow.get(p.getNonterminal())) {
+                    LL1Key temp2 = new LL1Key(p.getNonterminal(), b);
+                    parsingTable.put(temp2, p.getProduction());
+                }
+            } else if(p.getProduction().get(0) instanceof Nonterminal) {
+                for(GeneralSymbol s: first.get(p.getProduction().get(0))) {
+                    LL1Key temp = new LL1Key(p.getNonterminal(), s);
+                    parsingTable.put(temp, p.getProduction());
+                }
+            }
 
-        return parsingTable;
+        }
+        System.out.print(g);
+        System.out.println(first);
+        System.out.println(follow);
+        System.out.println(sortTable(parsingTable));
+
+        return sortTable(parsingTable);
     }
+
+    static private Map<LL1Key, List<GeneralSymbol>> sortTable( Map<LL1Key, List<GeneralSymbol>> parsingTable) {
+        // This sorts only the key, as the values in the set must be in the order of the rule
+        Map<LL1Key, List<GeneralSymbol>> sortedMap = new TreeMap<LL1Key, List<GeneralSymbol>>(new Comparator<LL1Key>() {
+            @Override
+            public int compare(LL1Key t1, LL1Key t2) {
+                return t1.toString().compareTo(t2.toString());
+            }
+        });
+
+        parsingTable.forEach((k,v)->{
+            sortedMap.put(k, v);
+        });
+
+        return sortedMap;
+    }
+
 }

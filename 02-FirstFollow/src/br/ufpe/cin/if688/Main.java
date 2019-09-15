@@ -47,11 +47,23 @@ public class Main {
             }
         }
         Grammar g = new Grammar(ps, ps.get(0).getNonterminal());
-
         try {
             Table.createTable(g);
         } catch (NotLL1Exception e) {
             throw new RuntimeException(e);
         }
     }
+
 }
+
+/*
+E -> TA
+A -> +TA
+A -> ^
+T -> FB
+B -> *FB
+B -> ^
+F -> (E)
+F -> i
+ */
+
