@@ -17,6 +17,8 @@ public class MaxArgsVisitor implements IVisitor<Integer> {
 
 	@Override
 	public Integer visit(Stm s) {
+		// Primeiro visitor a ser chamado
+		// Vai chamar no seu accept o visit do seu primeiro new
 		return s.accept(this);
 	}
 
@@ -34,22 +36,26 @@ public class MaxArgsVisitor implements IVisitor<Integer> {
 
 	@Override
 	public Integer visit(PrintStm s) {
-
-		return null;
+		// Retorna exatamente o que recebeu
+		int x = s.getExps().accept(this);
+		return x;
 	}
 
 	@Override
 	public Integer visit(Exp e) {
-		// TODO Auto-generated method stub
+		// Nem precisa implementar
 		return null;
 	}
 
 	@Override
 	public Integer visit(EseqExp e) {
-		// TODO Auto-generated method stub
-		return null;
+		// Retorna o máximo das duas expressões
+		int y = e.getStm().accept(this);
+		int x = e.getExp().accept(this);
+		return Math.max(x, y);
 	}
 
+	// Deixar com 0 mesmo;
 	@Override
 	public Integer visit(IdExp e) {
 		return 0;
@@ -62,26 +68,31 @@ public class MaxArgsVisitor implements IVisitor<Integer> {
 
 	@Override
 	public Integer visit(OpExp e) {
-		// TODO Auto-generated method stub
-		return null;
+		// Quando ocorre uma operacao, é como fosse um exp novo, por isso retorna 0;
+		return 0;
 	}
 
 	@Override
 	public Integer visit(ExpList el) {
-		// TODO Auto-generated method stub
+		// Nem precisa implementar
 		return null;
 	}
 
 	@Override
 	public Integer visit(PairExpList el) {
-		// TODO Auto-generated method stub
-		return null;
+		int x = el.getHead().accept(this);
+		int y = el.getTail().accept(this);
+		// Se o head for uma exp, soma 1 para se ter um retorno.
+		if(x == 0) x++;
+		return x + y;
 	}
 
 	@Override
 	public Integer visit(LastExpList el) {
-		// TODO Auto-generated method stub
-		return null;
+		int x = el.getHead().accept(this);
+		// Se o head for uma exp, soma 1 para se ter um retorno.
+		if(x == 0) x++;
+		return x;
 	}
 
 }
