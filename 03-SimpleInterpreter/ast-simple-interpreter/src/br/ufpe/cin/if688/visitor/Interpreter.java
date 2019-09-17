@@ -26,74 +26,111 @@ public class Interpreter implements IVisitor<Table> {
 
 	@Override
 	public Table visit(Stm s) {
-		// TODO Auto-generated method stub
-		return null;
+		Table t = s.accept(this);
+		return t;
 	}
 
 	@Override
 	public Table visit(AssignStm s) {
-		// TODO Auto-generated method stub
-		return null;
+		Table t1 = s.getExp().accept(this);
+		// O tail de t vai ser t1 ou t1.tail ou null?
+		Table t = new Table(s.getId(), t1.value, null);
+		Table oldTable = this.t;
+		this.t = new Table(s.getId(), t1.value, oldTable);
+		return t;
 	}
 
 	@Override
 	public Table visit(CompoundStm s) {
-		// TODO Auto-generated method stub
+		Table t1 = s.getStm1().accept(this);
+		Table t2 = s.getStm2().accept(this);
 		return null;
 	}
 
 	@Override
 	public Table visit(PrintStm s) {
-		// TODO Auto-generated method stub
-		return null;
+		Table t = s.getExps().accept(this);
+		// System.out.println("Print do visit do PrintStm");
+		Table t1 = t;
+		while(t1 != null) {
+			System.out.print(t1.value + "\n");
+			t1 = t1.tail;
+		}
+		return t;
 	}
 
 	@Override
 	public Table visit(Exp e) {
-		// TODO Auto-generated method stub
+		// Nem precisa tocar nisso(eu acho)
 		return null;
 	}
 
 	@Override
 	public Table visit(EseqExp e) {
-		// TODO Auto-generated method stub
-		return null;
+		Table exp = e.getExp().accept(this);
+		Table stm = e.getStm().accept(this);
+		Table t = new Table(null, exp.value, stm);
+		return t;
 	}
 
 	@Override
 	public Table visit(IdExp e) {
-		// TODO Auto-generated method stub
-		return null;
+//		Table t = new Table(e.getId(), );
+		String id = e.getId();
+		Table tempTable = this.t;
+		while (tempTable.id != id) {
+			tempTable = tempTable.tail;
+		}
+		return tempTable;
 	}
 
 	@Override
 	public Table visit(NumExp e) {
-		// TODO Auto-generated method stub
-		return null;
+		// System.out.println("Print do visit do NumExp");
+		Table t = new Table(null, e.getNum(), null);
+		return t;
 	}
 
 	@Override
 	public Table visit(OpExp e) {
-		// TODO Auto-generated method stub
-		return null;
+		// retorna uma table com o os valores passados na expressão
+		// Os accepts irão pegar os valores nas tables
+		Table t1 = e.getLeft().accept(this);
+		Table t2 = e.getRight().accept(this);
+		int op = e.getOper();
+		Table t = new Table(null, 0, null);
+		if(op == 1) {
+			t.value = t1.value + t2.value;
+		} else if (op == 2) {
+			t.value = t1.value - t2.value;
+		} else if (op == 3) {
+			t.value = t1.value * t2.value;
+		} else if (op == 4) {
+			t.value = t1.value / t2.value;
+		}
+		return t;
 	}
 
 	@Override
 	public Table visit(ExpList el) {
-		// TODO Auto-generated method stub
+		// Nem precisa tocar nisso(eu acho)
 		return null;
 	}
 
 	@Override
 	public Table visit(PairExpList el) {
-		// TODO Auto-generated method stub
-		return null;
+		// Quando ocorrer um PairExpList, será retornado uma table com o valor do head o tail do PairExpList, que poderá ser outro PairExpList ou LastExpList
+		Table t1 = el.getHead().accept(this);
+		Table t2 = el.getTail().accept(this);
+		Table t = new Table(null, t1.value, t2);
+		return t;
 	}
 
 	@Override
 	public Table visit(LastExpList el) {
-		// TODO Auto-generated method stub
-		return null;
+		// System.out.println("Print do visit do LastExpList");
+		Table t = el.getHead().accept(this);
+		return t;
 	}
 
 
