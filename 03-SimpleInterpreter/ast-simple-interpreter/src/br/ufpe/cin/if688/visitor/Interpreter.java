@@ -15,11 +15,11 @@ import br.ufpe.cin.if688.ast.Stm;
 import br.ufpe.cin.if688.symboltable.Table;
 
 public class Interpreter implements IVisitor<Table> {
-	
+
 	//a=8;b=80;a=7;
 	// a->7 ==> b->80 ==> a->8 ==> NIL
 	private Table t;
-	
+
 	public Interpreter(Table t) {
 		this.t = t;
 	}
@@ -27,7 +27,7 @@ public class Interpreter implements IVisitor<Table> {
 	@Override
 	public Table visit(Stm s) {
 		Table t = s.accept(this);
-		return t;
+		return this.t;
 	}
 
 	@Override
@@ -36,6 +36,8 @@ public class Interpreter implements IVisitor<Table> {
 		// O tail de t vai ser t1 ou t1.tail ou null?
 		Table t = new Table(s.getId(), t1.value, null);
 		Table oldTable = this.t;
+//		System.out.println("Print do AssignStm");
+//		System.out.println(t);
 		this.t = new Table(s.getId(), t1.value, oldTable);
 		return t;
 	}
@@ -50,7 +52,6 @@ public class Interpreter implements IVisitor<Table> {
 	@Override
 	public Table visit(PrintStm s) {
 		Table t = s.getExps().accept(this);
-		// System.out.println("Print do visit do PrintStm");
 		Table t1 = t;
 		while(t1 != null) {
 			System.out.print(t1.value + "\n");
@@ -67,34 +68,35 @@ public class Interpreter implements IVisitor<Table> {
 
 	@Override
 	public Table visit(EseqExp e) {
-		Table exp = e.getExp().accept(this);
 		Table stm = e.getStm().accept(this);
-		Table t = new Table(null, exp.value, stm);
+		Table exp = e.getExp().accept(this);
+		Table t = new Table(null, exp.value, null);
 		return t;
 	}
 
 	@Override
 	public Table visit(IdExp e) {
-//		Table t = new Table(e.getId(), );
 		String id = e.getId();
-		Table tempTable = this.t;
+		Table tempTable = new Table(this.t.id, this.t.value, this.t.tail);
+		// Percorrer a table do Interpreter atÃ© achar uma table que tenha o mesmo id que o id passado.
 		while (tempTable.id != id) {
-			tempTable = tempTable.tail;
+			tempTable = new Table(tempTable.tail.id, tempTable.tail.value, tempTable.tail.tail);
 		}
+		// Zerar a cauda da table retornada para nÃ£o printar zuado
+		tempTable.tail = null;
 		return tempTable;
 	}
 
 	@Override
 	public Table visit(NumExp e) {
-		// System.out.println("Print do visit do NumExp");
 		Table t = new Table(null, e.getNum(), null);
 		return t;
 	}
 
 	@Override
 	public Table visit(OpExp e) {
-		// retorna uma table com o os valores passados na expressão
-		// Os accepts irão pegar os valores nas tables
+		// retorna uma table com o os valores passados na expressÃ£o
+		// Os accepts irÃ£o pegar os valores nas tables
 		Table t1 = e.getLeft().accept(this);
 		Table t2 = e.getRight().accept(this);
 		int op = e.getOper();
@@ -119,9 +121,9 @@ public class Interpreter implements IVisitor<Table> {
 
 	@Override
 	public Table visit(PairExpList el) {
-		// Quando ocorrer um PairExpList, será retornado uma table com o valor do head o tail do PairExpList, que poderá ser outro PairExpList ou LastExpList
-		Table t1 = el.getHead().accept(this);
+		// Quando ocorrer um PairExpList, serÃ¡ retornado uma table com o valor do head o tail do PairExpList, que poderÃ¡ ser outro PairExpList ou LastExpList
 		Table t2 = el.getTail().accept(this);
+		Table t1 = el.getHead().accept(this);
 		Table t = new Table(null, t1.value, t2);
 		return t;
 	}
