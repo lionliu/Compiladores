@@ -15,11 +15,11 @@ import br.ufpe.cin.if688.ast.Stm;
 import br.ufpe.cin.if688.symboltable.Table;
 
 public class Interpreter implements IVisitor<Table> {
-	
+
 	//a=8;b=80;a=7;
 	// a->7 ==> b->80 ==> a->8 ==> NIL
 	private Table t;
-	
+
 	public Interpreter(Table t) {
 		this.t = t;
 	}
@@ -53,6 +53,7 @@ public class Interpreter implements IVisitor<Table> {
 	public Table visit(PrintStm s) {
 		Table t = s.getExps().accept(this);
 		Table t1 = new Table(t.id, t.value, t.tail);
+
 		while(t1 != null) {
 			System.out.print(t1.value + "\n");
 			t1 = t1.tail;
@@ -95,8 +96,8 @@ public class Interpreter implements IVisitor<Table> {
 
 	@Override
 	public Table visit(OpExp e) {
-		// retorna uma table com o os valores passados na expressão
-		// Os accepts irão pegar os valores nas tables
+		// retorna uma table com o os valores passados na expressÃ£o
+		// Os accepts irÃ£o pegar os valores nas tables
 		Table t1 = e.getLeft().accept(this);
 		Table t2 = e.getRight().accept(this);
 		int op = e.getOper();
