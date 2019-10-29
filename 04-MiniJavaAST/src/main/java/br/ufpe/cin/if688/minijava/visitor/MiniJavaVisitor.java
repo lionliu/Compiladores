@@ -192,6 +192,46 @@ public class MiniJavaVisitor implements MiniJavaGrammarVisitor{
     }
 
     @Override
+    public Object visitExpTrue(MiniJavaGrammarParser.ExpTrueContext ctx) {
+        return null;
+    }
+
+    @Override
+    public Object visitExpFalse(MiniJavaGrammarParser.ExpFalseContext ctx) {
+        return null;
+    }
+
+    @Override
+    public Object visitExpThis(MiniJavaGrammarParser.ExpThisContext ctx) {
+        return null;
+    }
+
+    @Override
+    public Object visitExpNumber(MiniJavaGrammarParser.ExpNumberContext ctx) {
+        return null;
+    }
+
+    @Override
+    public Object visitExpNewInt(MiniJavaGrammarParser.ExpNewIntContext ctx) {
+        return null;
+    }
+
+    @Override
+    public Object visitExpNewID(MiniJavaGrammarParser.ExpNewIDContext ctx) {
+        return null;
+    }
+
+    @Override
+    public Object visitExpNegate(MiniJavaGrammarParser.ExpNegateContext ctx) {
+        return null;
+    }
+
+    @Override
+    public Object visitExpParent(MiniJavaGrammarParser.ExpParentContext ctx) {
+        return null;
+    }
+
+    @Override
     public Object visitIdentifier(MiniJavaGrammarParser.IdentifierContext ctx) {
         ctx.Identifier().accept(this);
 

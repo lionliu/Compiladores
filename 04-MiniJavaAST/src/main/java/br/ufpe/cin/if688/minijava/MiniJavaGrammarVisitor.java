@@ -95,6 +95,54 @@ public interface MiniJavaGrammarVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitExpression(MiniJavaGrammarParser.ExpressionContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link MiniJavaGrammarParser#expTrue}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExpTrue(MiniJavaGrammarParser.ExpTrueContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiniJavaGrammarParser#expFalse}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExpFalse(MiniJavaGrammarParser.ExpFalseContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiniJavaGrammarParser#expThis}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExpThis(MiniJavaGrammarParser.ExpThisContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiniJavaGrammarParser#expNumber}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExpNumber(MiniJavaGrammarParser.ExpNumberContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiniJavaGrammarParser#expNewInt}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExpNewInt(MiniJavaGrammarParser.ExpNewIntContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiniJavaGrammarParser#expNewID}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExpNewID(MiniJavaGrammarParser.ExpNewIDContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiniJavaGrammarParser#expNegate}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExpNegate(MiniJavaGrammarParser.ExpNegateContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiniJavaGrammarParser#expParent}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExpParent(MiniJavaGrammarParser.ExpParentContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link MiniJavaGrammarParser#identifier}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
