@@ -1,32 +1,37 @@
 grammar MiniJavaGrammar;
 goal: mainClass (classDeclaration)* EOF;
-mainClass: 'class' Identifier '{' 'public' 'static' 'void' 'main' '(' 'String[]' Identifier ')' '{' statement '}' '}';
-classDeclaration: 'class' Identifier ('extends' Identifier )? '{' (varDeclaration)* ( methodDeclaration )* '}';
-varDeclaration: type Identifier ';';
-methodDeclaration: 'public' type Identifier '(' (type Identifier (',' type Identifier)*)? ')' '{' (varDeclaration)* (statement)* 'return' expression ';' '}';
-type: 'int' '[' ']' | 'boolean' | 'int' | Identifier;
+mainClass: 'class' identifier '{' 'public' 'static' 'void' 'main' '(' 'String[]' identifier ')' '{' statement '}' '}';
+classDeclaration: 'class' identifier ('extends' identifier )? '{' (varDeclaration)* ( methodDeclaration )* '}';
+varDeclaration: type identifier ';';
+methodDeclaration: 'public' type identifier '(' (type identifier (',' type identifier)*)? ')' '{' (varDeclaration)* (statement)* 'return' expression ';' '}';
+type: IntArray | Boolean | Int | identifier;
+Int: 'int';
+IntArray: 'int' '[' ']';
+Boolean: 'boolean';
 statement: '{' (statement)* '}'
         | 'if' '(' expression ')' statement 'else' statement
         | 'while' '(' expression ')' statement
         | 'System.out.println' '(' expression ')' ';'
-        | Identifier '=' expression ';'
-        | Identifier '[' expression ']' '=' expression ';'
+        | identifier '=' expression ';'
+        | identifier '[' expression ']' '=' expression ';'
         ;
 expression: expression ('&&' | '<' | '+' | '-' | '*') expression
         | expression '[' expression ']'
         | expression '.' 'length'
-        | expression '.' Identifier '(' (expression (',' expression)*)? ')'
+        | expression '.' identifier '(' (expression (',' expression)*)? ')'
         | (Digit)+
         | 'true'
         | 'false'
-        | Identifier
+        | identifier
         | 'this'
         | 'new' 'int' '[' expression ']'
-        | 'new' Identifier '(' ')'
+        | 'new' identifier '(' ')'
         | '!' expression
         | '(' expression ')'
         ;
-Identifier: [A-Za-z0-9_]+;
+identifier: Identifier;
+
+Identifier: [A-Za-z0-9_]+([A-Za-z0-9_])*;
 //Alphanumeric: Letter | Digit;
 //Letter: [A-Za-z_];
 Digit: [0-9];
