@@ -139,14 +139,56 @@ public class MiniJavaVisitor implements MiniJavaGrammarVisitor{
 
     @Override
     public Object visitStatement(MiniJavaGrammarParser.StatementContext ctx) {
+        if(ctx.statementBlock() != null) {
+            ctx.statementBlock().accept(this);
+        } else if(ctx.assignID() != null) {
+            ctx.assignID().accept(this);
+        } else if(ctx.whileStatement() != null) {
+            ctx.whileStatement().accept(this);
+        } else if(ctx.printStatement() != null) {
+            ctx.printStatement().accept(this);
+        } else if(ctx.ifStatement() != null) {
+            ctx.ifStatement().accept(this);
+        } else if(ctx.assignArray() != null) {
+            ctx.assignArray().accept(this);
+        }
+        return this.goal;
+    }
 
+    @Override
+    public Object visitStatementBlock(MiniJavaGrammarParser.StatementBlockContext ctx) {
+        return null;
+    }
+
+    @Override
+    public Object visitAssignID(MiniJavaGrammarParser.AssignIDContext ctx) {
+        return null;
+    }
+
+    @Override
+    public Object visitWhileStatement(MiniJavaGrammarParser.WhileStatementContext ctx) {
+        return null;
+    }
+
+    @Override
+    public Object visitIfStatement(MiniJavaGrammarParser.IfStatementContext ctx) {
+        return null;
+    }
+
+    @Override
+    public Object visitPrintStatement(MiniJavaGrammarParser.PrintStatementContext ctx) {
+        return null;
+    }
+
+    @Override
+    public Object visitAssignArray(MiniJavaGrammarParser.AssignArrayContext ctx) {
         return null;
     }
 
     @Override
     public Object visitExpression(MiniJavaGrammarParser.ExpressionContext ctx) {
 
-        return null;
+        return this.goal;
     }
 
     @Override

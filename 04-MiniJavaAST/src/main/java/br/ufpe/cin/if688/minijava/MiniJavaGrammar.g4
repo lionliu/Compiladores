@@ -8,26 +8,55 @@ type: IntArray | Boolean | Int | identifier;
 Int: 'int';
 IntArray: 'int' '[' ']';
 Boolean: 'boolean';
-statement: '{' (statement)* '}'
-        | 'if' '(' expression ')' statement 'else' statement
-        | 'while' '(' expression ')' statement
-        | 'System.out.println' '(' expression ')' ';'
-        | identifier '=' expression ';'
-        | identifier '[' expression ']' '=' expression ';'
+statement: statementBlock
+        | ifStatement
+        | whileStatement
+        | printStatement
+        | assignID
+        | assignArray
         ;
+statementBlock: '{' (statement)* '}'
+        ;
+assignID: identifier '=' expression ';'
+        ;
+whileStatement: 'while' '(' expression ')' statement
+        ;
+ifStatement: 'if' '(' expression ')' statement 'else' statement
+        ;
+printStatement: 'System.out.println' '(' expression ')' ';'
+        ;
+assignArray: identifier '[' expression ']' '=' expression ';'
+        ;
+
 expression: expression ('&&' | '<' | '+' | '-' | '*') expression
         | expression '[' expression ']'
         | expression '.' 'length'
         | expression '.' identifier '(' (expression (',' expression)*)? ')'
-        | (Digit)+
-        | 'true'
-        | 'false'
         | identifier
-        | 'this'
-        | 'new' 'int' '[' expression ']'
-        | 'new' identifier '(' ')'
-        | '!' expression
-        | '(' expression ')'
+        | expNumber
+        | expTrue
+        | expFalse
+        | expThis
+        | expNewInt
+        | expNegate
+        | expParent
+        | expNewID
+        ;
+expTrue: 'true'
+        ;
+expFalse: 'false'
+        ;
+expThis: 'this'
+        ;
+expNumber: (Digit)+
+        ;
+expNewInt: 'new' 'int' '[' expression ']'
+        ;
+expNewID: 'new' identifier '(' ')'
+        ;
+expNegate: '!' expression
+        ;
+expParent: '(' expression ')'
         ;
 identifier: Identifier;
 

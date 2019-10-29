@@ -53,6 +53,42 @@ public interface MiniJavaGrammarVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitStatement(MiniJavaGrammarParser.StatementContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link MiniJavaGrammarParser#statementBlock}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStatementBlock(MiniJavaGrammarParser.StatementBlockContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiniJavaGrammarParser#assignID}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAssignID(MiniJavaGrammarParser.AssignIDContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiniJavaGrammarParser#whileStatement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitWhileStatement(MiniJavaGrammarParser.WhileStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiniJavaGrammarParser#ifStatement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIfStatement(MiniJavaGrammarParser.IfStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiniJavaGrammarParser#printStatement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPrintStatement(MiniJavaGrammarParser.PrintStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiniJavaGrammarParser#assignArray}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAssignArray(MiniJavaGrammarParser.AssignArrayContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link MiniJavaGrammarParser#expression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
