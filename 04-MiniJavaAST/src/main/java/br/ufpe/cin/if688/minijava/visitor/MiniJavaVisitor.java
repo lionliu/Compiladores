@@ -94,7 +94,20 @@ public class MiniJavaVisitor implements MiniJavaGrammarVisitor{
 
         this.md = new MethodDecl(this.type, this.id, new FormalList(), vdl, sl, this.exp);
 
-        // implementar o accept das variáveis
+        if(ctx.type(1) != null) {
+            for (int i = 1; i < ctx.type().size(); i++) {
+                ctx.type(i).accept(this);
+                Type parameterType = this.type;
+
+                ctx.identifier(i).accept(this);
+                Identifier parameterIdentifier = this.id;
+
+                Formal formal = new Formal(parameterType, parameterIdentifier);
+
+                this.md.fl.addElement(formal);
+            }
+
+        }
 
         for (MiniJavaGrammarParser.VarDeclarationContext varDeclCtx : ctx.varDeclaration()) {
             varDeclCtx.accept(this);
