@@ -211,14 +211,30 @@ public class MiniJavaVisitor implements MiniJavaGrammarVisitor{
 
     @Override
     public Object visitExpression(MiniJavaGrammarParser.ExpressionContext ctx) {
-        if(ctx.ExpTrue() != null) {
-            this.exp = new True();
-        } else if(ctx.ExpFalse() != null) {
-            this.exp = new False();
-        } else if(ctx.ExpThis() != null) {
-            this.exp = new This();
-        } else if(ctx.ExpNumber() != null) {
 
+            if(ctx.ExpTrue() != null){
+            //this.exp = new True();
+                ctx.ExpTrue().accept(this);
+        }else if(ctx.ExpFalse() != null){
+            //this.exp = new False();
+                ctx.ExpFalse().accept(this);
+        }else if(ctx.ExpThis() != null){
+            //this.exp = new This();
+            ctx.ExpThis().accept(this);
+        }else if(ctx.ExpNumber() != null){
+            ctx.ExpNumber().accept(this); //
+        }else if(ctx.expNewInt() != null){
+
+        }else if(ctx.expNewID() != null){
+
+        }else if(ctx.expNegate() != null){
+            ctx.expNegate().accept(this);
+        }else if(ctx.expParent() != null){
+
+        }else if(ctx.identifier() != null){
+                //Aceita o identificador, e coloca na exp o valor coletado do identificador
+            ctx.identifier().accept(this);
+            this.exp = new IdentifierExp(this.id.toString());
         }
         return this.goal;
     }
@@ -246,7 +262,6 @@ public class MiniJavaVisitor implements MiniJavaGrammarVisitor{
     @Override
     public Object visitIdentifier(MiniJavaGrammarParser.IdentifierContext ctx) {
         ctx.Identifier().accept(this);
-
         this.id = new Identifier(this.symbol);
         return this.goal;
     }

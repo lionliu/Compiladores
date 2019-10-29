@@ -1,4 +1,4 @@
-// Generated from E:/Programming/Compiladores/CompiladoresRepo/04-MiniJavaAST/src/main/java/br/ufpe/cin/if688/minijava\MiniJavaGrammar.g4 by ANTLR 4.7.2
+// Generated from /home/wildclown/Desktop/compiladores/04-MiniJavaAST/src/main/java/br/ufpe/cin/if688/minijava/MiniJavaGrammar.g4 by ANTLR 4.7.2
 package br.ufpe.cin.if688.minijava;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 

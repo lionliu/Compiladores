@@ -28,10 +28,12 @@ printStatement: 'System.out.println' '(' expression ')' ';'
 assignArray: identifier '[' expression ']' '=' expression ';'
         ;
 
-expression: expression ('&&' | '<' | '+' | '-' | '*') expression
+expression:
+          expression ('&&' | '<' | '+' | '-' | '*') expression
         | expression '[' expression ']'
         | expression '.' 'length'
         | expression '.' identifier '(' (expression (',' expression)*)? ')'
+
         | identifier
         | ExpNumber
         | ExpTrue
@@ -41,6 +43,7 @@ expression: expression ('&&' | '<' | '+' | '-' | '*') expression
         | expNegate
         | expParent
         | expNewID
+
         ;
 ExpTrue: 'true'
         ;
