@@ -95,30 +95,6 @@ public interface MiniJavaGrammarVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitExpression(MiniJavaGrammarParser.ExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link MiniJavaGrammarParser#expTrue}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitExpTrue(MiniJavaGrammarParser.ExpTrueContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link MiniJavaGrammarParser#expFalse}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitExpFalse(MiniJavaGrammarParser.ExpFalseContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link MiniJavaGrammarParser#expThis}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitExpThis(MiniJavaGrammarParser.ExpThisContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link MiniJavaGrammarParser#expNumber}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitExpNumber(MiniJavaGrammarParser.ExpNumberContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link MiniJavaGrammarParser#expNewInt}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

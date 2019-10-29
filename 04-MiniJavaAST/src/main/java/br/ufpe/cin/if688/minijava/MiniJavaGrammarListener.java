@@ -148,46 +148,6 @@ public interface MiniJavaGrammarListener extends ParseTreeListener {
 	 */
 	void exitExpression(MiniJavaGrammarParser.ExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link MiniJavaGrammarParser#expTrue}.
-	 * @param ctx the parse tree
-	 */
-	void enterExpTrue(MiniJavaGrammarParser.ExpTrueContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MiniJavaGrammarParser#expTrue}.
-	 * @param ctx the parse tree
-	 */
-	void exitExpTrue(MiniJavaGrammarParser.ExpTrueContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MiniJavaGrammarParser#expFalse}.
-	 * @param ctx the parse tree
-	 */
-	void enterExpFalse(MiniJavaGrammarParser.ExpFalseContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MiniJavaGrammarParser#expFalse}.
-	 * @param ctx the parse tree
-	 */
-	void exitExpFalse(MiniJavaGrammarParser.ExpFalseContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MiniJavaGrammarParser#expThis}.
-	 * @param ctx the parse tree
-	 */
-	void enterExpThis(MiniJavaGrammarParser.ExpThisContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MiniJavaGrammarParser#expThis}.
-	 * @param ctx the parse tree
-	 */
-	void exitExpThis(MiniJavaGrammarParser.ExpThisContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MiniJavaGrammarParser#expNumber}.
-	 * @param ctx the parse tree
-	 */
-	void enterExpNumber(MiniJavaGrammarParser.ExpNumberContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MiniJavaGrammarParser#expNumber}.
-	 * @param ctx the parse tree
-	 */
-	void exitExpNumber(MiniJavaGrammarParser.ExpNumberContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link MiniJavaGrammarParser#expNewInt}.
 	 * @param ctx the parse tree
 	 */

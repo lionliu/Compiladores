@@ -33,22 +33,22 @@ expression: expression ('&&' | '<' | '+' | '-' | '*') expression
         | expression '.' 'length'
         | expression '.' identifier '(' (expression (',' expression)*)? ')'
         | identifier
-        | expNumber
-        | expTrue
-        | expFalse
-        | expThis
+        | ExpNumber
+        | ExpTrue
+        | ExpFalse
+        | ExpThis
         | expNewInt
         | expNegate
         | expParent
         | expNewID
         ;
-expTrue: 'true'
+ExpTrue: 'true'
         ;
-expFalse: 'false'
+ExpFalse: 'false'
         ;
-expThis: 'this'
+ExpThis: 'this'
         ;
-expNumber: (Digit)+
+ExpNumber: (Digit)+
         ;
 expNewInt: 'new' 'int' '[' expression ']'
         ;

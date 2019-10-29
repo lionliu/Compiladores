@@ -157,78 +157,90 @@ public class MiniJavaVisitor implements MiniJavaGrammarVisitor{
 
     @Override
     public Object visitStatementBlock(MiniJavaGrammarParser.StatementBlockContext ctx) {
-        return null;
-    }
-
-    @Override
-    public Object visitAssignID(MiniJavaGrammarParser.AssignIDContext ctx) {
-        return null;
-    }
-
-    @Override
-    public Object visitWhileStatement(MiniJavaGrammarParser.WhileStatementContext ctx) {
-        return null;
-    }
-
-    @Override
-    public Object visitIfStatement(MiniJavaGrammarParser.IfStatementContext ctx) {
-        return null;
-    }
-
-    @Override
-    public Object visitPrintStatement(MiniJavaGrammarParser.PrintStatementContext ctx) {
-        return null;
-    }
-
-    @Override
-    public Object visitAssignArray(MiniJavaGrammarParser.AssignArrayContext ctx) {
-        return null;
-    }
-
-    @Override
-    public Object visitExpression(MiniJavaGrammarParser.ExpressionContext ctx) {
-
+        StatementList sl = new StatementList();
+        for (MiniJavaGrammarParser.StatementContext sc : ctx.statement()) {
+            sc.accept(this);
+            sl.addElement(this.stm);
+        }
+        this.stm = new Block(sl);
         return this.goal;
     }
 
     @Override
-    public Object visitExpTrue(MiniJavaGrammarParser.ExpTrueContext ctx) {
-        return null;
+    public Object visitAssignID(MiniJavaGrammarParser.AssignIDContext ctx) {
+        ctx.identifier().accept(this);
+        ctx.expression().accept(this);
+        this.stm = new Assign(this.id, this.exp);
+        return this.goal;
     }
 
     @Override
-    public Object visitExpFalse(MiniJavaGrammarParser.ExpFalseContext ctx) {
-        return null;
+    public Object visitWhileStatement(MiniJavaGrammarParser.WhileStatementContext ctx) {
+        ctx.expression().accept(this);
+        ctx.statement().accept(this);
+        this.stm = new While(this.exp, this.stm);
+        return this.goal;
     }
 
     @Override
-    public Object visitExpThis(MiniJavaGrammarParser.ExpThisContext ctx) {
-        return null;
+    public Object visitIfStatement(MiniJavaGrammarParser.IfStatementContext ctx) {
+        ctx.expression().accept(this);
+        ctx.statement(0).accept(this);
+        Statement tempStm = this.stm;
+        ctx.statement(1).accept(this);
+        this.stm = new If(this.exp, tempStm, this.stm);
+        return this.goal;
     }
 
     @Override
-    public Object visitExpNumber(MiniJavaGrammarParser.ExpNumberContext ctx) {
-        return null;
+    public Object visitPrintStatement(MiniJavaGrammarParser.PrintStatementContext ctx) {
+        ctx.expression().accept(this);
+        this.stm = new Print(this.exp);
+        return this.goal;
+    }
+
+    @Override
+    public Object visitAssignArray(MiniJavaGrammarParser.AssignArrayContext ctx) {
+        ctx.identifier().accept(this);
+        ctx.expression(0).accept(this);
+        Exp tempExp = this.exp;
+        ctx.expression(1).accept(this);
+        this.stm = new ArrayAssign(this.id, tempExp, this.exp);
+        return this.goal;
+    }
+
+    @Override
+    public Object visitExpression(MiniJavaGrammarParser.ExpressionContext ctx) {
+        if(ctx.ExpTrue() != null) {
+            this.exp = new True();
+        } else if(ctx.ExpFalse() != null) {
+            this.exp = new False();
+        } else if(ctx.ExpThis() != null) {
+            this.exp = new This();
+        } else if(ctx.ExpNumber() != null) {
+
+        }
+        return this.goal;
     }
 
     @Override
     public Object visitExpNewInt(MiniJavaGrammarParser.ExpNewIntContext ctx) {
-        return null;
+        return this.goal;
     }
 
     @Override
     public Object visitExpNewID(MiniJavaGrammarParser.ExpNewIDContext ctx) {
-        return null;
+        return this.goal;
     }
 
     @Override
     public Object visitExpNegate(MiniJavaGrammarParser.ExpNegateContext ctx) {
-        return null;
+        return this.goal;
     }
 
     @Override
     public Object visitExpParent(MiniJavaGrammarParser.ExpParentContext ctx) {
-        return null;
+        return this.goal;
     }
 
     @Override
