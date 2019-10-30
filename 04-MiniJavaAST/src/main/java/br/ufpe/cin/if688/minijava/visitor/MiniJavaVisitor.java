@@ -1,6 +1,7 @@
 package br.ufpe.cin.if688.minijava.visitor;
 import br.ufpe.cin.if688.minijava.MiniJavaGrammarParser;
 import br.ufpe.cin.if688.minijava.MiniJavaGrammarVisitor;
+import com.sun.org.apache.xpath.internal.operations.Mult;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
@@ -224,18 +225,53 @@ public class MiniJavaVisitor implements MiniJavaGrammarVisitor{
         }else if(ctx.ExpNumber() != null){
             ctx.ExpNumber().accept(this); //
         }else if(ctx.expNewInt() != null){
-
+            ctx.expNewInt().accept(this);
         }else if(ctx.expNewID() != null){
-
+            ctx.expNewID().accept(this);
         }else if(ctx.expNegate() != null){
             ctx.expNegate().accept(this);
         }else if(ctx.expParent() != null){
-
+            ctx.expParent().accept(this);
         }else if(ctx.identifier() != null){
                 //Aceita o identificador, e coloca na exp o valor coletado do identificador
             ctx.identifier().accept(this);
             this.exp = new IdentifierExp(this.id.toString());
-        }
+        }else if(ctx.expression().size() == 1){
+
+            if(ctx.getChild(2).getText() == "length"){
+                Exp aux = (Exp) ctx.expression(0).accept(this);
+                return new ArrayLength(aux);
+            }
+        }else if(ctx.expression().size() == 2 && ctx.identifier() == null){ //Não sei se funciona
+                Object aux = ctx.expression(0).accept(this );
+                Exp expleft, expright;
+                if(aux instanceof Exp){
+                    expleft = (Exp) ctx.expression(0).accept(this);
+                }else{
+                    expleft = new IdentifierExp(ctx.expression(0).getText()); //Pegar o dado do identificador
+                }
+                Object aux2 = ctx.expression(1).accept(this); //segunda parte
+                if(aux2 instanceof Exp){
+                    expright = (Exp) ctx.expression(1).accept(this);
+                }else{
+                    expright = new IdentifierExp(ctx.expression(1).getText()); //Pegar o dado do identificador
+                }
+                if(ctx.getChild(1).getText() == "[" ){ //getChild pega o simbolo... daí to casando padrão
+                    return new ArrayLookup(expleft,expright);
+                }else if(ctx.getChild(1).getText() == "&&"){ //('&&' | '<' | '+' | '-' | '*')
+                    return new And(expleft,expright);
+                }else if(ctx.getChild(1).getText() ==  "<"){
+                    return new LessThan(expleft,expright);
+                }else if(ctx.getChild(1).getText() == "+"){
+                    return new Plus(expleft,expright);
+                }else if(ctx.getChild(1).getText() == "-"){
+                    return new Minus(expleft,expright);
+                }else if(ctx.getChild(1).getText() == "*"){
+                    return new Times(expleft,expright);
+                }
+            }else{
+
+            }
         return this.goal;
     }
 
