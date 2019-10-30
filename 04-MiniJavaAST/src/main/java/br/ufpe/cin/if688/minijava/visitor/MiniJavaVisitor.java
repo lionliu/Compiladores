@@ -214,14 +214,11 @@ public class MiniJavaVisitor implements MiniJavaGrammarVisitor{
     public Object visitExpression(MiniJavaGrammarParser.ExpressionContext ctx) {
 
             if(ctx.ExpTrue() != null){
-            //this.exp = new True();
-                ctx.ExpTrue().accept(this);
+            this.exp = new True();
         }else if(ctx.ExpFalse() != null){
-            //this.exp = new False();
-                ctx.ExpFalse().accept(this);
+            this.exp = new False();
         }else if(ctx.ExpThis() != null){
-            //this.exp = new This();
-            ctx.ExpThis().accept(this);
+            this.exp = new This();
         }else if(ctx.ExpNumber() != null){
             ctx.ExpNumber().accept(this); //
         }else if(ctx.expNewInt() != null){
