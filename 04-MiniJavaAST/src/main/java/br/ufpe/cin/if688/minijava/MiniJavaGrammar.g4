@@ -60,7 +60,7 @@ expParent: '(' expression ')'
         ;
 identifier: Identifier;
 
-Identifier: [A-Za-z0-9_]+([A-Za-z0-9_])*;
+Identifier: [A-Za-z_][A-Za-z0-9_]*;
 //Alphanumeric: Letter | Digit;
 //Letter: [A-Za-z_];
 Digit: [0-9];

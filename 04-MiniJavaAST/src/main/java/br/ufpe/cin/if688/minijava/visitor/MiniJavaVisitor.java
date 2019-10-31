@@ -7,6 +7,8 @@ import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import br.ufpe.cin.if688.minijava.ast.*;
 
+import static java.lang.Integer.parseInt;
+
 public class MiniJavaVisitor implements MiniJavaGrammarVisitor{
 
     private Program goal;
@@ -41,9 +43,10 @@ public class MiniJavaVisitor implements MiniJavaGrammarVisitor{
         ctx.identifier(0).accept(this);
         Identifier tempId = this.id;
         ctx.identifier(1).accept(this);
+        Identifier tempId2 = this.id;
         ctx.statement().accept(this);
 
-        this.mc = new MainClass(tempId, this.id, this.stm);
+        this.mc = new MainClass(tempId, tempId2, this.stm);
         return this.goal;
     }
 
@@ -87,12 +90,15 @@ public class MiniJavaVisitor implements MiniJavaGrammarVisitor{
     @Override
     public Object visitMethodDeclaration(MiniJavaGrammarParser.MethodDeclarationContext ctx) {
         ctx.type(0).accept(this);
+        Type tempType = this.type;
         ctx.identifier(0).accept(this);
+        Identifier tempId = this.id;
         ctx.expression().accept(this);
+        Exp tempExp = this.exp;
         VarDeclList vdl = new VarDeclList();
         StatementList sl = new StatementList();
 
-        this.md = new MethodDecl(this.type, this.id, new FormalList(), vdl, sl, this.exp);
+        this.md = new MethodDecl(tempType, tempId, new FormalList(), vdl, sl, tempExp);
 
         if(ctx.type(1) != null) {
             for (int i = 1; i < ctx.type().size(); i++) {
@@ -169,26 +175,29 @@ public class MiniJavaVisitor implements MiniJavaGrammarVisitor{
     @Override
     public Object visitAssignID(MiniJavaGrammarParser.AssignIDContext ctx) {
         ctx.identifier().accept(this);
+        Identifier i = this.id;
         ctx.expression().accept(this);
-        this.stm = new Assign(this.id, this.exp);
+        this.stm = new Assign(i, this.exp);
         return this.goal;
     }
 
     @Override
     public Object visitWhileStatement(MiniJavaGrammarParser.WhileStatementContext ctx) {
         ctx.expression().accept(this);
+        Exp tempExp = this.exp;
         ctx.statement().accept(this);
-        this.stm = new While(this.exp, this.stm);
+        this.stm = new While(tempExp, this.stm);
         return this.goal;
     }
 
     @Override
     public Object visitIfStatement(MiniJavaGrammarParser.IfStatementContext ctx) {
         ctx.expression().accept(this);
+        Exp tempExp = this.exp;
         ctx.statement(0).accept(this);
         Statement tempStm = this.stm;
         ctx.statement(1).accept(this);
-        this.stm = new If(this.exp, tempStm, this.stm);
+        this.stm = new If(tempExp, tempStm, this.stm);
         return this.goal;
     }
 
@@ -202,44 +211,100 @@ public class MiniJavaVisitor implements MiniJavaGrammarVisitor{
     @Override
     public Object visitAssignArray(MiniJavaGrammarParser.AssignArrayContext ctx) {
         ctx.identifier().accept(this);
+        Identifier tempId = this.id;
         ctx.expression(0).accept(this);
         Exp tempExp = this.exp;
         ctx.expression(1).accept(this);
-        this.stm = new ArrayAssign(this.id, tempExp, this.exp);
+        this.stm = new ArrayAssign(tempId, tempExp, this.exp);
         return this.goal;
     }
 
     @Override
     public Object visitExpression(MiniJavaGrammarParser.ExpressionContext ctx) {
-        if(ctx.ExpTrue() != null) {
+        int qtExp = ctx.expression().size();
+        int qtChild = ctx.getChildCount();
+        if(qtChild > 4 && ctx.getChild(3).getText().equals("(")) {
+            ctx.expression(0).accept(this);
+            Exp tempExp = this.exp;
+            ctx.identifier().accept(this);
+            Identifier tempId = this.id;
+            ExpList parameters = new ExpList();
+            for(int i = 1; i < ctx.expression().size(); i++) {
+                ctx.expression(i).accept(this);
+                parameters.addElement(this.exp);
+            }
+            this.exp = new Call(tempExp, tempId, parameters);
+        } else if(qtChild == 4 && ctx.getChild(1).getText().equals("[")) {
+            ctx.expression(0).accept(this);
+            Exp tempExp = this.exp;
+            ctx.expression(1).accept(this);
+            this.exp = new ArrayLookup(tempExp, this.exp);
+        } else if(qtChild == 3 && ctx.getChild(2).getText().equals("length")) {
+            ctx.expression(0).accept(this);
+            this.exp = new ArrayLength(this.exp);
+        } else if(qtExp == 2) {
+            ctx.expression(0).accept(this);
+            Exp tempExp = this.exp;
+            ctx.expression(1).accept(this);
+            if(ctx.getChild(1).getText().equals("&&")) {
+                this.exp = new And(tempExp, this.exp);
+            } else if(ctx.getChild(1).getText().equals("<")) {
+                this.exp = new LessThan(tempExp, this.exp);
+            } else if(ctx.getChild(1).getText().equals("+")) {
+                this.exp = new Plus(tempExp, this.exp);
+            } else if(ctx.getChild(1).getText().equals("-")) {
+                this.exp = new Minus(tempExp, this.exp);
+            } else if(ctx.getChild(1).getText().equals("*")) {
+                this.exp = new Times(tempExp, this.exp);
+            }
+        } else if(ctx.ExpTrue() != null) {
             this.exp = new True();
         } else if(ctx.ExpFalse() != null) {
             this.exp = new False();
         } else if(ctx.ExpThis() != null) {
             this.exp = new This();
         } else if(ctx.ExpNumber() != null) {
-
+            String num = ctx.ExpNumber().getText();
+            this.exp = new IntegerLiteral(parseInt(num));
+        } else if(ctx.expNewID() != null) {
+            ctx.expNewID().accept(this);
+        } else if(ctx.expNewInt() != null) {
+            ctx.expNewInt().accept(this);
+        } else if(ctx.expNegate() != null) {
+            ctx.expNegate().accept(this);
+        } else if(ctx.expParent() != null) {
+            ctx.expParent().accept(this);
+        } else if(ctx.identifier() != null) {
+            ctx.identifier().accept(this);
+            this.exp = new IdentifierExp(this.id.toString());
         }
         return this.goal;
     }
 
     @Override
     public Object visitExpNewInt(MiniJavaGrammarParser.ExpNewIntContext ctx) {
+        ctx.expression().accept(this);
+        this.exp = new NewArray(this.exp);
         return this.goal;
     }
 
     @Override
     public Object visitExpNewID(MiniJavaGrammarParser.ExpNewIDContext ctx) {
+        ctx.identifier().accept(this);
+        this.exp = new NewObject(this.id);
         return this.goal;
     }
 
     @Override
     public Object visitExpNegate(MiniJavaGrammarParser.ExpNegateContext ctx) {
+        ctx.expression().accept(this);
+        this.exp = new Not(this.exp);
         return this.goal;
     }
 
     @Override
     public Object visitExpParent(MiniJavaGrammarParser.ExpParentContext ctx) {
+        ctx.expression().accept(this);
         return this.goal;
     }
 
