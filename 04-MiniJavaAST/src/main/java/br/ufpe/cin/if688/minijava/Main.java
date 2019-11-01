@@ -1,7 +1,7 @@
 package br.ufpe.cin.if688.minijava;
 
-import br.ufpe.cin.if688.minijava.MiniJavaGrammarLexer;
-import br.ufpe.cin.if688.minijava.MiniJavaGrammarParser;
+import br.ufpe.cin.if688.minijava.antlr.MiniJavaGrammarLexer;
+import br.ufpe.cin.if688.minijava.antlr.MiniJavaGrammarParser;
 import br.ufpe.cin.if688.minijava.ast.Program;
 import br.ufpe.cin.if688.minijava.visitor.MiniJavaVisitor;
 import br.ufpe.cin.if688.minijava.visitor.PrettyPrintVisitor;

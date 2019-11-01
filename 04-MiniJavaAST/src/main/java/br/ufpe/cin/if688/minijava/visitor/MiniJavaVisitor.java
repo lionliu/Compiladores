@@ -1,6 +1,6 @@
 package br.ufpe.cin.if688.minijava.visitor;
-import br.ufpe.cin.if688.minijava.MiniJavaGrammarParser;
-import br.ufpe.cin.if688.minijava.MiniJavaGrammarVisitor;
+import br.ufpe.cin.if688.minijava.antlr.MiniJavaGrammarParser;
+import br.ufpe.cin.if688.minijava.antlr.MiniJavaGrammarVisitor;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
