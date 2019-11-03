@@ -52,6 +52,7 @@ public class BuildSymbolTableVisitor implements IVisitor<Void> {
 
 	private Class currClass;
 	private Method currMethod;
+	private Identifier id;
 
 	// MainClass m;
 	// ClassDeclList cl;
@@ -69,6 +70,7 @@ public class BuildSymbolTableVisitor implements IVisitor<Void> {
 		n.i1.accept(this);
 		n.i2.accept(this);
 		n.s.accept(this);
+		this.symbolTable.addClass(n.i1.toString(), null);
 		return null;
 	}
 
@@ -77,6 +79,7 @@ public class BuildSymbolTableVisitor implements IVisitor<Void> {
 	// MethodDeclList ml;
 	public Void visit(ClassDeclSimple n) {
 		n.i.accept(this);
+		this.symbolTable.addClass(n.i.toString(), null);
 		for (int i = 0; i < n.vl.size(); i++) {
 			n.vl.elementAt(i).accept(this);
 		}
@@ -93,6 +96,7 @@ public class BuildSymbolTableVisitor implements IVisitor<Void> {
 	public Void visit(ClassDeclExtends n) {
 		n.i.accept(this);
 		n.j.accept(this);
+		this.symbolTable.addClass(n.i.toString(), n.j.toString());
 		for (int i = 0; i < n.vl.size(); i++) {
 			n.vl.elementAt(i).accept(this);
 		}
