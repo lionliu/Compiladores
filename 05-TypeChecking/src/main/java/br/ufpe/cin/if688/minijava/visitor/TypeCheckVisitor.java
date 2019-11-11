@@ -35,12 +35,16 @@ import br.ufpe.cin.if688.minijava.ast.True;
 import br.ufpe.cin.if688.minijava.ast.Type;
 import br.ufpe.cin.if688.minijava.ast.VarDecl;
 import br.ufpe.cin.if688.minijava.ast.While;
+import br.ufpe.cin.if688.minijava.symboltable.Method;
 import br.ufpe.cin.if688.minijava.symboltable.SymbolTable;
 import br.ufpe.cin.if688.minijava.exceptions.PrintException;
+import br.ufpe.cin.if688.minijava.symboltable.Variable;
 
 public class TypeCheckVisitor implements IVisitor<Type> {
 
 	private SymbolTable symbolTable;
+
+	private PrintException printException = new PrintException();
 
 	public TypeCheckVisitor(SymbolTable st) {
 		this.symbolTable = st;
@@ -251,11 +255,28 @@ public class TypeCheckVisitor implements IVisitor<Type> {
 	// Identifier i;
 	// ExpList el;
 	public Type visit(Call n) {
+
 		n.e.accept(this);
 		n.i.accept(this);
 		for (int i = 0; i < n.el.size(); i++) {
 			n.el.elementAt(i).accept(this);
 		}
+		if(n.e instanceof  NewObject) {
+			NewObject no = (NewObject) n.e;
+			Method m = this.symbolTable.getMethod(n.i.toString(), no.i.toString());
+			int paramCount = 0;
+			Variable temp;
+			do { // meter o do while aqui
+				temp = m.getParamAt(paramCount);
+				paramCount++;
+			} while (temp != null);
+			if(n.el.size() > (paramCount - 1)) {
+				printException.tooManyArguments(n.i.toString());
+			} else if(n.el.size() < (paramCount - 1)) {
+				printException.tooFewArguments(n.i.toString());
+			}
+		}
+
 		return null;
 	}
 
