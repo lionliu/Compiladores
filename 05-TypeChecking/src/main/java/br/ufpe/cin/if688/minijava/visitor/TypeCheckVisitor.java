@@ -36,13 +36,14 @@ import br.ufpe.cin.if688.minijava.ast.Type;
 import br.ufpe.cin.if688.minijava.ast.VarDecl;
 import br.ufpe.cin.if688.minijava.ast.While;
 import br.ufpe.cin.if688.minijava.symboltable.SymbolTable;
+import br.ufpe.cin.if688.minijava.exceptions.PrintException;
 
 public class TypeCheckVisitor implements IVisitor<Type> {
 
 	private SymbolTable symbolTable;
 
 	public TypeCheckVisitor(SymbolTable st) {
-		symbolTable = st;
+		this.symbolTable = st;
 	}
 
 	// MainClass m;
@@ -169,6 +170,7 @@ public class TypeCheckVisitor implements IVisitor<Type> {
 	// Exp e;
 	// Statement s;
 	public Type visit(While n) {
+
 		n.e.accept(this);
 		n.s.accept(this);
 		return null;

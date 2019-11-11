@@ -37,6 +37,7 @@ import br.ufpe.cin.if688.minijava.ast.While;
 import br.ufpe.cin.if688.minijava.symboltable.Class;
 import br.ufpe.cin.if688.minijava.symboltable.Method;
 import br.ufpe.cin.if688.minijava.symboltable.SymbolTable;
+import br.ufpe.cin.if688.minijava.exceptions.PrintException;
 
 public class BuildSymbolTableVisitor implements IVisitor<Void> {
 
@@ -50,6 +51,7 @@ public class BuildSymbolTableVisitor implements IVisitor<Void> {
 		return symbolTable;
 	}
 
+    private PrintException printException = new PrintException();
 	private Class currClass;
 	private Method currMethod;
 	private Identifier id;
@@ -67,10 +69,10 @@ public class BuildSymbolTableVisitor implements IVisitor<Void> {
 	// Identifier i1,i2;
 	// Statement s;
 	public Void visit(MainClass n) {
+        this.symbolTable.addClass(n.i1.toString(), null);
 		n.i1.accept(this);
 		n.i2.accept(this);
 		n.s.accept(this);
-		this.symbolTable.addClass(n.i1.toString(), null);
 		return null;
 	}
 
@@ -79,13 +81,20 @@ public class BuildSymbolTableVisitor implements IVisitor<Void> {
 	// MethodDeclList ml;
 	public Void visit(ClassDeclSimple n) {
 		n.i.accept(this);
-		this.symbolTable.addClass(n.i.toString(), null);
+
+		if(this.symbolTable.containsClass(n.i.toString())) {
+            this.printException.duplicateClass(n.i.toString());
+        } else {
+            this.symbolTable.addClass(n.i.toString(), null);
+            this.currClass = this.symbolTable.getClass(n.i.toString());
+        }
 		for (int i = 0; i < n.vl.size(); i++) {
 			n.vl.elementAt(i).accept(this);
 		}
 		for (int i = 0; i < n.ml.size(); i++) {
 			n.ml.elementAt(i).accept(this);
 		}
+		this.currClass = null; // Para lançar a exception se um método for declarado fora de uma classe;
 		return null;
 	}
 
@@ -96,19 +105,40 @@ public class BuildSymbolTableVisitor implements IVisitor<Void> {
 	public Void visit(ClassDeclExtends n) {
 		n.i.accept(this);
 		n.j.accept(this);
-		this.symbolTable.addClass(n.i.toString(), n.j.toString());
+        if(this.symbolTable.containsClass(n.i.toString())) {
+            this.printException.duplicateClass(n.i.toString());
+        } else {
+            this.symbolTable.addClass(n.i.toString(), n.j.toString());
+            this.currClass = this.symbolTable.getClass((n.i.toString()));
+        }
 		for (int i = 0; i < n.vl.size(); i++) {
 			n.vl.elementAt(i).accept(this);
 		}
 		for (int i = 0; i < n.ml.size(); i++) {
 			n.ml.elementAt(i).accept(this);
 		}
+        this.currClass = null; // Para lançar a exception se um método for declarado fora de uma classe;
 		return null;
 	}
 
 	// Type t;
 	// Identifier i;
 	public Void visit(VarDecl n) {
+        // Variable tempVar = new Variable(n.i.toString(), n.t);
+        // Se o currMethod for nulo, quer dizer que a variável atual é um atributo da classe.
+        if(this.currMethod == null) {
+            if(this.currClass.containsVar(n.i.toString())) {
+                this.printException.duplicateVariable(n.i.toString());
+            } else {
+                this.currClass.addVar(n.i.toString(), n.t);
+            }
+        } else {
+            if(this.currMethod.containsVar(n.i.toString())) {
+                this.printException.duplicateVariable(n.i.toString());
+            } else {
+                this.currMethod.addVar(n.i.toString(), n.t);
+            }
+        }
 		n.t.accept(this);
 		n.i.accept(this);
 		return null;
@@ -123,6 +153,17 @@ public class BuildSymbolTableVisitor implements IVisitor<Void> {
 	public Void visit(MethodDecl n) {
 		n.t.accept(this);
 		n.i.accept(this);
+
+		if(this.currClass == null) {
+		    this.printException.methodDeclarationOutsideOfClass(n.i.toString());
+        }
+
+		if(this.currClass.containsMethod(n.i.toString())) {
+		    printException.duplicateMethod(n.i.toString());
+        } else {
+            this.currClass.addMethod(n.i.toString(), n.t);
+            this.currMethod = this.symbolTable.getMethod(n.i.toString(), this.currClass.getId());
+        }
 		for (int i = 0; i < n.fl.size(); i++) {
 			n.fl.elementAt(i).accept(this);
 		}
@@ -133,12 +174,20 @@ public class BuildSymbolTableVisitor implements IVisitor<Void> {
 			n.sl.elementAt(i).accept(this);
 		}
 		n.e.accept(this);
+
+		this.currMethod = null; // resetar o metodo para as variáveis serem adicionadas na classe.
 		return null;
 	}
 
 	// Type t;
 	// Identifier i;
 	public Void visit(Formal n) {
+	    // Formal = parametros do método
+        if(this.currMethod.containsParam(n.i.toString())) {
+            this.printException.duplicateParameter(n.i.toString());
+        } else {
+            this.currMethod.addParam(n.i.toString(), n.t);
+        }
 		n.t.accept(this);
 		n.i.accept(this);
 		return null;
