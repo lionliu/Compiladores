@@ -1,40 +1,7 @@
 package br.ufpe.cin.if688.minijava.visitor;
 
-import br.ufpe.cin.if688.minijava.ast.And;
-import br.ufpe.cin.if688.minijava.ast.ArrayAssign;
-import br.ufpe.cin.if688.minijava.ast.ArrayLength;
-import br.ufpe.cin.if688.minijava.ast.ArrayLookup;
-import br.ufpe.cin.if688.minijava.ast.Assign;
-import br.ufpe.cin.if688.minijava.ast.Block;
-import br.ufpe.cin.if688.minijava.ast.BooleanType;
-import br.ufpe.cin.if688.minijava.ast.Call;
-import br.ufpe.cin.if688.minijava.ast.ClassDeclExtends;
-import br.ufpe.cin.if688.minijava.ast.ClassDeclSimple;
-import br.ufpe.cin.if688.minijava.ast.False;
-import br.ufpe.cin.if688.minijava.ast.Formal;
-import br.ufpe.cin.if688.minijava.ast.Identifier;
-import br.ufpe.cin.if688.minijava.ast.IdentifierExp;
-import br.ufpe.cin.if688.minijava.ast.IdentifierType;
-import br.ufpe.cin.if688.minijava.ast.If;
-import br.ufpe.cin.if688.minijava.ast.IntArrayType;
-import br.ufpe.cin.if688.minijava.ast.IntegerLiteral;
-import br.ufpe.cin.if688.minijava.ast.IntegerType;
-import br.ufpe.cin.if688.minijava.ast.LessThan;
-import br.ufpe.cin.if688.minijava.ast.MainClass;
-import br.ufpe.cin.if688.minijava.ast.MethodDecl;
-import br.ufpe.cin.if688.minijava.ast.Minus;
-import br.ufpe.cin.if688.minijava.ast.NewArray;
-import br.ufpe.cin.if688.minijava.ast.NewObject;
-import br.ufpe.cin.if688.minijava.ast.Not;
-import br.ufpe.cin.if688.minijava.ast.Plus;
-import br.ufpe.cin.if688.minijava.ast.Print;
-import br.ufpe.cin.if688.minijava.ast.Program;
-import br.ufpe.cin.if688.minijava.ast.This;
-import br.ufpe.cin.if688.minijava.ast.Times;
-import br.ufpe.cin.if688.minijava.ast.True;
-import br.ufpe.cin.if688.minijava.ast.Type;
-import br.ufpe.cin.if688.minijava.ast.VarDecl;
-import br.ufpe.cin.if688.minijava.ast.While;
+import br.ufpe.cin.if688.minijava.ast.*;
+import br.ufpe.cin.if688.minijava.symboltable.Class;
 import br.ufpe.cin.if688.minijava.symboltable.Method;
 import br.ufpe.cin.if688.minijava.symboltable.SymbolTable;
 import br.ufpe.cin.if688.minijava.exceptions.PrintException;
@@ -49,6 +16,9 @@ public class TypeCheckVisitor implements IVisitor<Type> {
 	public TypeCheckVisitor(SymbolTable st) {
 		this.symbolTable = st;
 	}
+
+	private Class currClass;
+	private Method currMethod;
 
 	// MainClass m;
 	// ClassDeclList cl;
@@ -74,12 +44,14 @@ public class TypeCheckVisitor implements IVisitor<Type> {
 	// MethodDeclList ml;
 	public Type visit(ClassDeclSimple n) {
 		n.i.accept(this);
+		this.currClass = this.symbolTable.getClass(n.i.toString());
 		for (int i = 0; i < n.vl.size(); i++) {
 			n.vl.elementAt(i).accept(this);
 		}
 		for (int i = 0; i < n.ml.size(); i++) {
 			n.ml.elementAt(i).accept(this);
 		}
+		this.currClass = null;
 		return null;
 	}
 
@@ -90,12 +62,18 @@ public class TypeCheckVisitor implements IVisitor<Type> {
 	public Type visit(ClassDeclExtends n) {
 		n.i.accept(this);
 		n.j.accept(this);
+		this.currClass = this.symbolTable.getClass(n.i.toString());
+		Class tempClass = this.symbolTable.getClass(n.j.toString());
+		if(tempClass == null) {
+			this.printException.idNotFound(n.j.toString());
+		}
 		for (int i = 0; i < n.vl.size(); i++) {
 			n.vl.elementAt(i).accept(this);
 		}
 		for (int i = 0; i < n.ml.size(); i++) {
 			n.ml.elementAt(i).accept(this);
 		}
+		this.currClass = null;
 		return null;
 	}
 
@@ -116,6 +94,7 @@ public class TypeCheckVisitor implements IVisitor<Type> {
 	public Type visit(MethodDecl n) {
 		n.t.accept(this);
 		n.i.accept(this);
+		this.currMethod = this.symbolTable.getMethod(n.i.toString(), this.currClass.getId());
 		for (int i = 0; i < n.fl.size(); i++) {
 			n.fl.elementAt(i).accept(this);
 		}
@@ -126,6 +105,15 @@ public class TypeCheckVisitor implements IVisitor<Type> {
 			n.sl.elementAt(i).accept(this);
 		}
 		n.e.accept(this);
+
+		if(n.e instanceof IdentifierExp) {
+			// P/ checar se existe no escopo
+			IdentifierExp ie = (IdentifierExp) n.e;
+			Type tempType = this.symbolTable.getVarType(this.currMethod, this.currClass, ie.s);
+		}
+
+
+		this.currMethod = null;
 		return null;
 	}
 
@@ -138,20 +126,20 @@ public class TypeCheckVisitor implements IVisitor<Type> {
 	}
 
 	public Type visit(IntArrayType n) {
-		return null;
+		return n;
 	}
 
 	public Type visit(BooleanType n) {
-		return null;
+		return n;
 	}
 
 	public Type visit(IntegerType n) {
-		return null;
+		return n;
 	}
 
 	// String s;
 	public Type visit(IdentifierType n) {
-		return null;
+		return n;
 	}
 
 	// StatementList sl;
@@ -165,6 +153,15 @@ public class TypeCheckVisitor implements IVisitor<Type> {
 	// Exp e;
 	// Statement s1,s2;
 	public Type visit(If n) {
+		if(n.e instanceof IdentifierExp) {
+			IdentifierExp exp = (IdentifierExp) n.e;
+			Type current = this.symbolTable.getVarType(this.currMethod, this.currClass,exp.s);
+			// System.out.println(exp.s);
+			if(!this.symbolTable.compareTypes(current, new BooleanType())) {
+				this.printException.typeMatch(new BooleanType(), current);
+			}
+		}
+
 		n.e.accept(this);
 		n.s1.accept(this);
 		n.s2.accept(this);
@@ -174,6 +171,17 @@ public class TypeCheckVisitor implements IVisitor<Type> {
 	// Exp e;
 	// Statement s;
 	public Type visit(While n) {
+		// Exp exp;
+		// Deve ter outras instancias.
+		if(n.e instanceof IdentifierExp) {
+			IdentifierExp exp = (IdentifierExp) n.e;
+			Type current = this.symbolTable.getVarType(this.currMethod, this.currClass,exp.s);
+			if(!this.symbolTable.compareTypes(current, new BooleanType())) {
+				this.printException.typeMatch(new BooleanType(), current);
+			}
+		}
+
+
 
 		n.e.accept(this);
 		n.s.accept(this);
@@ -190,13 +198,18 @@ public class TypeCheckVisitor implements IVisitor<Type> {
 	// Exp e;
 	public Type visit(Assign n) {
 		n.i.accept(this);
-		n.e.accept(this);
+		Type actual = n.e.accept(this);
+		Type expected = this.symbolTable.getVarType(this.currMethod, this.currClass, n.i.toString());
+		if(!this.symbolTable.compareTypes(expected, actual) && actual != null) {
+			this.printException.typeMatch(expected, actual);
+		}
 		return null;
 	}
 
 	// Identifier i;
 	// Exp e1,e2;
 	public Type visit(ArrayAssign n) {
+		// Não sei se precisa implementar esse.
 		n.i.accept(this);
 		n.e1.accept(this);
 		n.e2.accept(this);
@@ -207,35 +220,174 @@ public class TypeCheckVisitor implements IVisitor<Type> {
 	public Type visit(And n) {
 		n.e1.accept(this);
 		n.e2.accept(this);
-		return null;
+
+		if(n.e1 instanceof IdentifierExp) {
+			IdentifierExp ie = (IdentifierExp) n.e1;
+			Variable var = this.currMethod.getVar(ie.s);
+			if(var == null) {
+				var = this.currMethod.getParam(ie.s);
+			}
+			if(!this.symbolTable.compareTypes(var.type(), new BooleanType())) {
+				this.printException.typeMatch(new BooleanType(), var.type());
+			}
+		} else if(n.e1 instanceof IntegerLiteral) {
+			this.printException.typeMatch(new BooleanType(), new IntegerType());
+		}
+
+		if(n.e2 instanceof IdentifierExp) {
+			IdentifierExp ie = (IdentifierExp) n.e2;
+			Variable var = this.currMethod.getVar(ie.s);
+			if(var == null) {
+				var = this.currMethod.getParam(ie.s);
+			}
+			if(!this.symbolTable.compareTypes(var.type(), new BooleanType())) {
+				this.printException.typeMatch(new BooleanType(), var.type());
+			}
+		} else if(n.e2 instanceof IntegerLiteral) {
+			this.printException.typeMatch(new BooleanType(), new IntegerType());
+		}
+
+		return new BooleanType();
 	}
 
 	// Exp e1,e2;
 	public Type visit(LessThan n) {
 		n.e1.accept(this);
 		n.e2.accept(this);
-		return null;
+
+		// Pode estar faltando alguma instancia
+		if(n.e1 instanceof IdentifierExp) {
+			IdentifierExp ie = (IdentifierExp) n.e1;
+			Variable var = this.currMethod.getVar(ie.s);
+			if(var == null) {
+				var = this.currMethod.getParam(ie.s);
+			}
+			if(!this.symbolTable.compareTypes(var.type(), new IntegerType())) {
+				this.printException.typeMatch(new IntegerType(), var.type());
+			}
+		} else if(n.e1 instanceof True || n.e1 instanceof False || n.e1 instanceof Not) {
+			this.printException.typeMatch(new IntegerType(), new BooleanType());
+		}
+
+		if(n.e2 instanceof IdentifierExp) {
+			IdentifierExp ie = (IdentifierExp) n.e2;
+			Variable var = this.currMethod.getVar(ie.s);
+			if(var == null) {
+				var = this.currMethod.getParam(ie.s);
+			}
+			if(!this.symbolTable.compareTypes(var.type(), new IntegerType())) {
+				this.printException.typeMatch(new IntegerType(), var.type());
+			}
+		} else if(n.e2 instanceof True || n.e2 instanceof False || n.e2 instanceof Not) {
+			this.printException.typeMatch(new IntegerType(), new BooleanType());
+		}
+
+		return new BooleanType();
 	}
 
 	// Exp e1,e2;
 	public Type visit(Plus n) {
 		n.e1.accept(this);
 		n.e2.accept(this);
-		return null;
+
+		// Pode estar faltando alguma instancia
+		if(n.e1 instanceof IdentifierExp) {
+			IdentifierExp ie = (IdentifierExp) n.e1;
+			Variable var = this.currMethod.getVar(ie.s);
+			if(var == null) {
+				var = this.currMethod.getParam(ie.s);
+			}
+			if(!this.symbolTable.compareTypes(var.type(), new IntegerType())) {
+				this.printException.typeMatch(new IntegerType(), var.type());
+			}
+		} else if(n.e1 instanceof True || n.e1 instanceof False || n.e1 instanceof Not) {
+			this.printException.typeMatch(new IntegerType(), new BooleanType());
+		}
+
+		if(n.e2 instanceof IdentifierExp) {
+			IdentifierExp ie = (IdentifierExp) n.e2;
+			Variable var = this.currMethod.getVar(ie.s);
+			if(var == null) {
+				var = this.currMethod.getParam(ie.s);
+			}
+			if(!this.symbolTable.compareTypes(var.type(), new IntegerType())) {
+				this.printException.typeMatch(new IntegerType(), var.type());
+			}
+		} else if(n.e2 instanceof True || n.e2 instanceof False || n.e2 instanceof Not) {
+			this.printException.typeMatch(new IntegerType(), new BooleanType());
+		}
+
+		return new IntegerType();
 	}
 
 	// Exp e1,e2;
 	public Type visit(Minus n) {
 		n.e1.accept(this);
 		n.e2.accept(this);
-		return null;
+
+		// Pode estar faltando alguma instancia
+		if(n.e1 instanceof IdentifierExp) {
+			IdentifierExp ie = (IdentifierExp) n.e1;
+			Variable var = this.currMethod.getVar(ie.s);
+			if(var == null) {
+				var = this.currMethod.getParam(ie.s);
+			}
+			if(!this.symbolTable.compareTypes(var.type(), new IntegerType())) {
+				this.printException.typeMatch(new IntegerType(), var.type());
+			}
+		} else if(n.e1 instanceof True || n.e1 instanceof False || n.e1 instanceof Not) {
+			this.printException.typeMatch(new IntegerType(), new BooleanType());
+		}
+
+		if(n.e2 instanceof IdentifierExp) {
+			IdentifierExp ie = (IdentifierExp) n.e2;
+			Variable var = this.currMethod.getVar(ie.s);
+			if(var == null) {
+				var = this.currMethod.getParam(ie.s);
+			}
+			if(!this.symbolTable.compareTypes(var.type(), new IntegerType())) {
+				this.printException.typeMatch(new IntegerType(), var.type());
+			}
+		} else if(n.e2 instanceof True || n.e2 instanceof False || n.e2 instanceof Not) {
+			this.printException.typeMatch(new IntegerType(), new BooleanType());
+		}
+
+		return new IntegerType();
 	}
 
 	// Exp e1,e2;
 	public Type visit(Times n) {
 		n.e1.accept(this);
 		n.e2.accept(this);
-		return null;
+
+		// Pode estar faltando alguma instancia
+		if(n.e1 instanceof IdentifierExp) {
+			IdentifierExp ie = (IdentifierExp) n.e1;
+			Variable var = this.currMethod.getVar(ie.s);
+			if(var == null) {
+				var = this.currMethod.getParam(ie.s);
+			}
+			if(!this.symbolTable.compareTypes(var.type(), new IntegerType())) {
+				this.printException.typeMatch(new IntegerType(), var.type());
+			}
+		} else if(n.e1 instanceof True || n.e1 instanceof False || n.e1 instanceof Not) {
+			this.printException.typeMatch(new IntegerType(), new BooleanType());
+		}
+
+		if(n.e2 instanceof IdentifierExp) {
+			IdentifierExp ie = (IdentifierExp) n.e2;
+			Variable var = this.currMethod.getVar(ie.s);
+			if(var == null) {
+				var = this.currMethod.getParam(ie.s);
+			}
+			if(!this.symbolTable.compareTypes(var.type(), new IntegerType())) {
+				this.printException.typeMatch(new IntegerType(), var.type());
+			}
+		} else if(n.e2 instanceof True || n.e2 instanceof False || n.e2 instanceof Not) {
+			this.printException.typeMatch(new IntegerType(), new BooleanType());
+		}
+
+		return new IntegerType();
 	}
 
 	// Exp e1,e2;
@@ -261,12 +413,20 @@ public class TypeCheckVisitor implements IVisitor<Type> {
 		for (int i = 0; i < n.el.size(); i++) {
 			n.el.elementAt(i).accept(this);
 		}
-		if(n.e instanceof  NewObject) {
+		// Pode ter outras instancias?
+		if(n.e instanceof NewObject) {
 			NewObject no = (NewObject) n.e;
-			Method m = this.symbolTable.getMethod(n.i.toString(), no.i.toString());
+			Class tempClass = this.symbolTable.getClass(no.i.toString());
+			if(tempClass == null) {
+				this.printException.idNotFound(no.i.toString());
+			}
+			Method m = tempClass.getMethod(n.i.toString());
+			if(m == null) {
+				this.printException.idNotFound(n.i.toString());
+			}
 			int paramCount = 0;
 			Variable temp;
-			do { // meter o do while aqui
+			do {
 				temp = m.getParamAt(paramCount);
 				paramCount++;
 			} while (temp != null);
@@ -282,20 +442,20 @@ public class TypeCheckVisitor implements IVisitor<Type> {
 
 	// int i;
 	public Type visit(IntegerLiteral n) {
-		return null;
+		return new IntegerType();
 	}
 
 	public Type visit(True n) {
-		return null;
+		return new BooleanType();
 	}
 
 	public Type visit(False n) {
-		return null;
+		return new BooleanType();
 	}
 
 	// String s;
 	public Type visit(IdentifierExp n) {
-		return null;
+		return this.symbolTable.getVarType(this.currMethod, this.currClass, n.s);
 	}
 
 	public Type visit(This n) {
@@ -316,7 +476,7 @@ public class TypeCheckVisitor implements IVisitor<Type> {
 	// Exp e;
 	public Type visit(Not n) {
 		n.e.accept(this);
-		return null;
+		return new BooleanType();
 	}
 
 	// String s;

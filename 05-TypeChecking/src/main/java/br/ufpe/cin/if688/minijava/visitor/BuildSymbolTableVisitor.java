@@ -52,6 +52,7 @@ public class BuildSymbolTableVisitor implements IVisitor<Void> {
 	}
 
     private PrintException printException = new PrintException();
+
 	private Class currClass;
 	private Method currMethod;
 	private Identifier id;

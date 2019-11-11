@@ -57,6 +57,8 @@ public class SymbolTable {
 				}
 			}
 		}
+//		System.out.println(m.id);
+//		System.out.println(c.id);
 		System.out.println("Variable " + id + " not defined in current scope");
 		System.exit(0);
 //		throw new RuntimeException(String.format("Variavel " + id + " nao definida no escopo atual"));
