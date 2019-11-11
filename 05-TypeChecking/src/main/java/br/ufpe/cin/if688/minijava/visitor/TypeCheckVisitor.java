@@ -200,6 +200,7 @@ public class TypeCheckVisitor implements IVisitor<Type> {
 		n.i.accept(this);
 		Type actual = n.e.accept(this);
 		Type expected = this.symbolTable.getVarType(this.currMethod, this.currClass, n.i.toString());
+		// Gambiarra nesse &&
 		if(!this.symbolTable.compareTypes(expected, actual) && actual != null) {
 			this.printException.typeMatch(expected, actual);
 		}
@@ -216,36 +217,43 @@ public class TypeCheckVisitor implements IVisitor<Type> {
 		return null;
 	}
 
+	public void isIdentifierOk(Exp e, Type expected) {
+		IdentifierExp ie = (IdentifierExp) e;
+		Type actual = this.symbolTable.getVarType(this.currMethod, this.currClass, ie.s);
+		if(!this.symbolTable.compareTypes(actual, expected)) {
+			this.printException.typeMatch(expected, actual);
+		}
+	}
+
+	public void isOperationOk(Exp e1, Exp e2, Type expected) {
+		// Pode estar faltando alguma instancia
+		if(e1 instanceof IdentifierExp) {
+			isIdentifierOk(e1, expected);
+		}
+
+		if(e2 instanceof IdentifierExp) {
+			isIdentifierOk(e2, expected);
+		}
+
+		if(expected instanceof BooleanType && (e1 instanceof IntegerLiteral || e2 instanceof IntegerLiteral)) {
+			this.printException.typeMatch(new BooleanType(), new IntegerType());
+		}
+
+		if(expected instanceof IntegerType &&
+				((e1 instanceof True || e1 instanceof False || e1 instanceof Not) ||
+						(e2 instanceof True || e2 instanceof False || e2 instanceof Not))) {
+			this.printException.typeMatch(new IntegerType(), new BooleanType());
+		}
+
+	}
+
+	// TODO: Trocar todos os getVar() por getVarType()
 	// Exp e1,e2;
 	public Type visit(And n) {
 		n.e1.accept(this);
 		n.e2.accept(this);
 
-		if(n.e1 instanceof IdentifierExp) {
-			IdentifierExp ie = (IdentifierExp) n.e1;
-			Variable var = this.currMethod.getVar(ie.s);
-			if(var == null) {
-				var = this.currMethod.getParam(ie.s);
-			}
-			if(!this.symbolTable.compareTypes(var.type(), new BooleanType())) {
-				this.printException.typeMatch(new BooleanType(), var.type());
-			}
-		} else if(n.e1 instanceof IntegerLiteral) {
-			this.printException.typeMatch(new BooleanType(), new IntegerType());
-		}
-
-		if(n.e2 instanceof IdentifierExp) {
-			IdentifierExp ie = (IdentifierExp) n.e2;
-			Variable var = this.currMethod.getVar(ie.s);
-			if(var == null) {
-				var = this.currMethod.getParam(ie.s);
-			}
-			if(!this.symbolTable.compareTypes(var.type(), new BooleanType())) {
-				this.printException.typeMatch(new BooleanType(), var.type());
-			}
-		} else if(n.e2 instanceof IntegerLiteral) {
-			this.printException.typeMatch(new BooleanType(), new IntegerType());
-		}
+		isOperationOk(n.e1, n.e2, new BooleanType());
 
 		return new BooleanType();
 	}
@@ -255,32 +263,7 @@ public class TypeCheckVisitor implements IVisitor<Type> {
 		n.e1.accept(this);
 		n.e2.accept(this);
 
-		// Pode estar faltando alguma instancia
-		if(n.e1 instanceof IdentifierExp) {
-			IdentifierExp ie = (IdentifierExp) n.e1;
-			Variable var = this.currMethod.getVar(ie.s);
-			if(var == null) {
-				var = this.currMethod.getParam(ie.s);
-			}
-			if(!this.symbolTable.compareTypes(var.type(), new IntegerType())) {
-				this.printException.typeMatch(new IntegerType(), var.type());
-			}
-		} else if(n.e1 instanceof True || n.e1 instanceof False || n.e1 instanceof Not) {
-			this.printException.typeMatch(new IntegerType(), new BooleanType());
-		}
-
-		if(n.e2 instanceof IdentifierExp) {
-			IdentifierExp ie = (IdentifierExp) n.e2;
-			Variable var = this.currMethod.getVar(ie.s);
-			if(var == null) {
-				var = this.currMethod.getParam(ie.s);
-			}
-			if(!this.symbolTable.compareTypes(var.type(), new IntegerType())) {
-				this.printException.typeMatch(new IntegerType(), var.type());
-			}
-		} else if(n.e2 instanceof True || n.e2 instanceof False || n.e2 instanceof Not) {
-			this.printException.typeMatch(new IntegerType(), new BooleanType());
-		}
+		isOperationOk(n.e1, n.e2, new IntegerType());
 
 		return new BooleanType();
 	}
@@ -290,32 +273,7 @@ public class TypeCheckVisitor implements IVisitor<Type> {
 		n.e1.accept(this);
 		n.e2.accept(this);
 
-		// Pode estar faltando alguma instancia
-		if(n.e1 instanceof IdentifierExp) {
-			IdentifierExp ie = (IdentifierExp) n.e1;
-			Variable var = this.currMethod.getVar(ie.s);
-			if(var == null) {
-				var = this.currMethod.getParam(ie.s);
-			}
-			if(!this.symbolTable.compareTypes(var.type(), new IntegerType())) {
-				this.printException.typeMatch(new IntegerType(), var.type());
-			}
-		} else if(n.e1 instanceof True || n.e1 instanceof False || n.e1 instanceof Not) {
-			this.printException.typeMatch(new IntegerType(), new BooleanType());
-		}
-
-		if(n.e2 instanceof IdentifierExp) {
-			IdentifierExp ie = (IdentifierExp) n.e2;
-			Variable var = this.currMethod.getVar(ie.s);
-			if(var == null) {
-				var = this.currMethod.getParam(ie.s);
-			}
-			if(!this.symbolTable.compareTypes(var.type(), new IntegerType())) {
-				this.printException.typeMatch(new IntegerType(), var.type());
-			}
-		} else if(n.e2 instanceof True || n.e2 instanceof False || n.e2 instanceof Not) {
-			this.printException.typeMatch(new IntegerType(), new BooleanType());
-		}
+		isOperationOk(n.e1, n.e2, new IntegerType());
 
 		return new IntegerType();
 	}
@@ -325,33 +283,7 @@ public class TypeCheckVisitor implements IVisitor<Type> {
 		n.e1.accept(this);
 		n.e2.accept(this);
 
-		// Pode estar faltando alguma instancia
-		if(n.e1 instanceof IdentifierExp) {
-			IdentifierExp ie = (IdentifierExp) n.e1;
-			Variable var = this.currMethod.getVar(ie.s);
-			if(var == null) {
-				var = this.currMethod.getParam(ie.s);
-			}
-			if(!this.symbolTable.compareTypes(var.type(), new IntegerType())) {
-				this.printException.typeMatch(new IntegerType(), var.type());
-			}
-		} else if(n.e1 instanceof True || n.e1 instanceof False || n.e1 instanceof Not) {
-			this.printException.typeMatch(new IntegerType(), new BooleanType());
-		}
-
-		if(n.e2 instanceof IdentifierExp) {
-			IdentifierExp ie = (IdentifierExp) n.e2;
-			Variable var = this.currMethod.getVar(ie.s);
-			if(var == null) {
-				var = this.currMethod.getParam(ie.s);
-			}
-			if(!this.symbolTable.compareTypes(var.type(), new IntegerType())) {
-				this.printException.typeMatch(new IntegerType(), var.type());
-			}
-		} else if(n.e2 instanceof True || n.e2 instanceof False || n.e2 instanceof Not) {
-			this.printException.typeMatch(new IntegerType(), new BooleanType());
-		}
-
+		isOperationOk(n.e1, n.e2, new IntegerType());
 		return new IntegerType();
 	}
 
@@ -360,32 +292,7 @@ public class TypeCheckVisitor implements IVisitor<Type> {
 		n.e1.accept(this);
 		n.e2.accept(this);
 
-		// Pode estar faltando alguma instancia
-		if(n.e1 instanceof IdentifierExp) {
-			IdentifierExp ie = (IdentifierExp) n.e1;
-			Variable var = this.currMethod.getVar(ie.s);
-			if(var == null) {
-				var = this.currMethod.getParam(ie.s);
-			}
-			if(!this.symbolTable.compareTypes(var.type(), new IntegerType())) {
-				this.printException.typeMatch(new IntegerType(), var.type());
-			}
-		} else if(n.e1 instanceof True || n.e1 instanceof False || n.e1 instanceof Not) {
-			this.printException.typeMatch(new IntegerType(), new BooleanType());
-		}
-
-		if(n.e2 instanceof IdentifierExp) {
-			IdentifierExp ie = (IdentifierExp) n.e2;
-			Variable var = this.currMethod.getVar(ie.s);
-			if(var == null) {
-				var = this.currMethod.getParam(ie.s);
-			}
-			if(!this.symbolTable.compareTypes(var.type(), new IntegerType())) {
-				this.printException.typeMatch(new IntegerType(), var.type());
-			}
-		} else if(n.e2 instanceof True || n.e2 instanceof False || n.e2 instanceof Not) {
-			this.printException.typeMatch(new IntegerType(), new BooleanType());
-		}
+		isOperationOk(n.e1, n.e2, new IntegerType());
 
 		return new IntegerType();
 	}
