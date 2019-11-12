@@ -110,6 +110,10 @@ public class TypeCheckVisitor implements IVisitor<Type> {
 			// P/ checar se existe no escopo
 			IdentifierExp ie = (IdentifierExp) n.e;
 			Type tempType = this.symbolTable.getVarType(this.currMethod, this.currClass, ie.s);
+            Type methodType = this.symbolTable.getMethodType(n.i.s, this.currClass.getId());
+            if(!this.symbolTable.compareTypes(tempType, methodType)) {
+                this.printException.typeMatch(methodType, tempType);
+            }
 		}
 
 
@@ -181,8 +185,6 @@ public class TypeCheckVisitor implements IVisitor<Type> {
 			}
 		}
 
-
-
 		n.e.accept(this);
 		n.s.accept(this);
 		return null;
@@ -247,7 +249,6 @@ public class TypeCheckVisitor implements IVisitor<Type> {
 
 	}
 
-	// TODO: Trocar todos os getVar() por getVarType()
 	// Exp e1,e2;
 	public Type visit(And n) {
 		n.e1.accept(this);
